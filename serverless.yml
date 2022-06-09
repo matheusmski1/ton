@@ -7,14 +7,22 @@ provider:
   name: aws
   runtime: nodejs14.x
 
+plugins:
+  - serverless-offline
+
+custom:
+  devRegion: 'us-east-1'
+
 functions:
-  hello:
-    handler: handler.hello
+  createUser:
+    handler: src/createUser/handler.createUser
+    environment: 
+      DEV_REGION: ${self:custom.devRegion}
     events:
       - httpApi:
-          path: /
-          method: get
-
+          path: /user
+          method: post
+          cors: true
 resources: 
   Resources:
     usersTable:
