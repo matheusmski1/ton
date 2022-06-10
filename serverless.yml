@@ -6,7 +6,12 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: nodejs14.x
-
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: '*'
+          Resource: '*'
 plugins:
   - serverless-offline
 
@@ -20,9 +25,20 @@ functions:
       DEV_REGION: ${self:custom.devRegion}
     events:
       - httpApi:
+          method: POST
           path: /user
-          method: post
           cors: true
+
+  readUser:
+    handler: src/readUser/handler.readUser
+    environment: 
+      DEV_REGION: ${self:custom.devRegion}
+    events:
+      - httpApi:
+          method: GET
+          path: /user/{email}
+          cors: true          
+
 resources: 
   Resources:
     usersTable:
