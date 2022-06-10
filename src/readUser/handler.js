@@ -1,21 +1,29 @@
 "use strict";
-const AWS = require('aws-sdk');
-AWS.config.update({region: 'REGION'});
+const AWS = require("aws-sdk");
+AWS.config.update({ region: process.env.DEV_REGION });
+const ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 
+module.exports.readUser = (event, context, callback) => {
+  const email = event.pathParameters.email
 
-
-export async function hello(event) {
-
-const ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
-
-ddb.createTable(params, function(err, data) {
-  if (err) {
-    console.log("Error", err);
-  } else {
-    console.log("Table Created", data);
+  const params = {
+    TableName: "usersTable",
+    Key: {
+      email: { S: email },
+    },
+  };
+  
+  return ddb.getItem(params).promise()
+  .then((data) => {
+      callback(null, response(200, data.Item))
+    }).catch(err => callback(null, response(err.statusCode, err)))
   }
-});
-
-
-return
-}
+  
+  function response(statusCode, message) {
+    return {
+      statusCode: statusCode,
+      body: JSON.stringify(message)
+    }
+  }
+  
+  

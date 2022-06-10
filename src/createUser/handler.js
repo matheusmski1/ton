@@ -3,7 +3,7 @@ const AWS = require("aws-sdk");
 AWS.config.update({ region: process.env.DEV_REGION });
 
 module.exports.createUser = async (event, context, callback) => {
-  const data = JSON.parse(event.body);
+  const data = event.body;
   const ddb = new AWS.DynamoDB();
 
   if (!data.email || !data.name)
@@ -20,9 +20,16 @@ module.exports.createUser = async (event, context, callback) => {
     },
   };
 
-  ddb.putItem(params, function (err) {
-    if (err) throw new Error(err);
-  });
+  return ddb.putItem(params).promise()
+  .then((data) => {
+      callback(null, response(200, "User created"))
+    }).catch(err => callback(null, response(err.statusCode, err)))
 
-  return { Status: 200, message: "User created" };
 };
+
+function response(statusCode, message) {
+  return {
+    statusCode: statusCode,
+    body: JSON.stringify(message)
+  }
+}
