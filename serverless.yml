@@ -14,13 +14,20 @@ provider:
           Resource: '*'
 plugins:
   - serverless-offline
+  - serverless-auto-swagger
 
 custom:
   devRegion: 'us-east-1'
+  documentation:
+    version: '1'
+    title: 'API Teste TON'
+    description: 'Teste tecnico TON'
+    models: {}
 
 functions:
+
   createUser:
-    handler: src/createUser/handler.createUser
+    handler: src/dynamoDb/createUser/handler.createUser
     environment: 
       DEV_REGION: ${self:custom.devRegion}
     events:
@@ -30,14 +37,32 @@ functions:
           cors: true
 
   readUser:
-    handler: src/readUser/handler.readUser
+    handler: src/dynamoDb/readUser/handler.readUser
     environment: 
       DEV_REGION: ${self:custom.devRegion}
     events:
       - httpApi:
           method: GET
           path: /user/{email}
-          cors: true          
+          cors: true    
+
+  incrementCount:
+    handler: src/countApi/implement/handler.count
+    environment: 
+    events:
+      - httpApi:
+          method: GET
+          path: /count/increment
+          cors: true
+
+  getCount:
+    handler: src/countApi/read/handler.read
+    environment: 
+    events:
+      - httpApi:
+          method: GET
+          path: /count
+          cors: true     
 
 resources: 
   Resources:

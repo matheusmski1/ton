@@ -3,7 +3,7 @@ const AWS = require("aws-sdk");
 AWS.config.update({ region: process.env.DEV_REGION });
 
 module.exports.createUser = async (event, context, callback) => {
-  const data = event.body;
+  const data = JSON.parse(event.body);
   const ddb = new AWS.DynamoDB();
 
   if (!data.email || !data.name)
